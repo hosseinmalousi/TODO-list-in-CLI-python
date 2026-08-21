@@ -10,8 +10,6 @@ def print_art():
     print()
     print(Asccii_art.art + "\n")
 
-
-
 class Task:
     
     
@@ -27,6 +25,7 @@ class Task:
         self.date = date
         self.desc = desc
         self.done = False
+        ### this line under must be changed i guess
         Task.tasks.append({"uniq_code":self.uniq_code,"task":self.task,"desc":self.desc,"date":self.date , "done" : self.done})
     
     def __str__(self):
@@ -36,8 +35,10 @@ class Task:
     def list_tasks(cls):
         print("***************")
         ### show it as a string and sort them or with bullet points
-        for task in cls.tasks:
-            print(f"the task : {task["task"]}, is due to {task["date"]}; descirption : '{task["desc"]}'")
+        enu_list = enumerate(cls.tasks,1) ### it only effect on showing and the new ones also works 
+        for i,task in enu_list:
+            # print()
+            print(f"{i}. the task : {task["task"]}, is due to {task["date"]}; descirption : '{task["desc"]}'")
         print("***************")
     
     @classmethod
