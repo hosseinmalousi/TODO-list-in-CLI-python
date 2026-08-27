@@ -12,12 +12,12 @@ def print_art():
 
 class Task:
     
-    
-    tasks=[]
+    undone_tasks=[]
+    done_tasks = []
     with open(file_path,"r") as f:
         data = json.load(f)
         for task in data :
-            tasks.append(task)
+            undone_tasks.append(task)
     
     def __init__(self,task,desc="",date="nodate"):
         self.uniq_code = str(uuid.uuid4())
@@ -26,29 +26,56 @@ class Task:
         self.desc = desc
         self.done = False
         ### this line under must be changed i guess
-        Task.tasks.append({"uniq_code":self.uniq_code,"task":self.task,"desc":self.desc,"date":self.date , "done" : self.done})
-    
-    def __str__(self):
-        return f"the task : {self.task} is due to {datetime.date(self.date)}\ndescirption : '{self.desc}'"
+        Task.undone_tasks.append({"uniq_code":self.uniq_code,"task":self.task,"desc":self.desc,"date":self.date , "done" : self.done})
+
         
     @classmethod
     def list_tasks(cls):
         print("***************")
+        print()
         ### show it as a string and sort them or with bullet points
-        enu_list = enumerate(cls.tasks,1) ### it only effect on showing and the new ones also works 
-        for i,task in enu_list:
-            # print()
-            print(f"{i}. the task : {task["task"]}, is due to {task["date"]}; descirption : '{task["desc"]}'")
+        # it only effect on showing and the new ones also works 
+        if cls.undone_tasks :
+            for i,task in enumerate(cls.undone_tasks,1):
+                if task["done"] == False:
+                    print(f"{i}. the task : {task["task"]}, is due to {task["date"]}; descirption : '{task["desc"]}'")
+            print()
+        else :
+            print("U have no task waiting for u ,go enjoy your day 🔥")
+            print()
         print("***************")
+    
+    @classmethod
+    def done(cls):
+        option = int(input("which task are u done with :")) -1
+        cls.undone_tasks[option]["done"] = True
+        cls.done_tasks.append(cls.undone_tasks[option])
+        cls.undone_tasks.pop(option)
+    
+    @classmethod
+    def delete_task(cls):
+        option = input("which task do you wanna delete (A for all) :")
+        if option.isalpha() and option.upper() == "A" :
+            cls.undone_tasks.clear()
+        elif option.isnumeric() :
+            option = int(option)
+            try:
+                cls.undone_tasks.pop(option -1)
+            except IndexError :
+                print("The index you have chosen is not in the tasks")
+        else:
+            print("Please choose a the index of the task or 'A' for deleting all the list ")
+        cls.write_to_file()
     
     @classmethod
     def write_to_file(cls):
         with open(file=file_path,mode="w+" ) as file:
-            json.dump(cls.tasks,file,indent=4)
+            json.dump(cls.undone_tasks,file,indent=4)
 
 def add_task():
     task_name=input("What do u wanna do champ ? 🎖️\n ")
-    ### date should be formed correctly
+    
+    ### date should be formed correctly ### also the format and cooerct writing is really important
     date=input("when do u wanna do it (DD-MM-YYYY)? (leave blank for no date)\n")
     if date :
         date = datetime.datetime.strptime(date,"%d-%m-%Y").date()
@@ -56,31 +83,31 @@ def add_task():
         date = "no date"
     desc=input("is there any decription ? (enter to leave it blank) \n")
     Task(task_name,desc,date)
+    Task.write_to_file()
 
 def main():
     print_art()
     is_running = True
     while is_running:
         print(f"today is {datetime.date.today().strftime("%A")} {datetime.date.today().strftime("%d:%m:%Y")}")
-        if Task.tasks :
-            Task.list_tasks()
         
-        action = input("""1.tick a task \n2.add a task  \n3.delete a task \n4.edit a task \n5.quit the program\nplease add (1 , 2 , 3, 4)""")
+        Task.list_tasks()
+        
+        action = input("""1.tick a task \n2.add a task  \n3.delete a task \n4.edit a task \n5.quit the program\n\nplease add the index: """)
         
         match action:
             case "1" :
-                pass
+                Task.done()
             case "2":
                 ### make it a func and show the tasks more beutiful
                 add_task()
-                Task.write_to_file()
             case "3":
-                pass
+                Task.delete_task()
             case "4":
                 pass
             case "5":
                 break
-                
+    print()          
 
 if __name__ == "__main__":
     main()
