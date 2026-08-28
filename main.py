@@ -47,10 +47,24 @@ class Task:
     
     @classmethod
     def done(cls):
-        option = int(input("which task are u done with :")) -1
-        cls.undone_tasks[option]["done"] = True
-        cls.done_tasks.append(cls.undone_tasks[option])
-        cls.undone_tasks.pop(option)
+        while True :
+            try :
+                option = int(input("which task are u done with :")) -1
+                cls.undone_tasks[option]["done"] = True
+                cls.done_tasks.append(cls.undone_tasks[option])
+                cls.undone_tasks.pop(option)
+            except IndexError :
+                print("the number you have enterd is not in the tasks")
+                continue
+            except ValueError :
+                print("Please insert a number")
+                continue
+            print("The task has been ticked, good job")
+            print(cls.done_tasks)
+            break
+                
+            
+            
     
     @classmethod
     def delete_task(cls):
