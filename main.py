@@ -4,7 +4,8 @@ import uuid
 import datetime
 import json
 
-file_path = "tasks.json"
+file_path_undone = "undone_tasks.json"
+file_path_done = "done_tasks.json"
 
 def print_art():
     print()
@@ -14,10 +15,16 @@ class Task:
     
     undone_tasks=[]
     done_tasks = []
-    with open(file_path,"r") as f:
-        data = json.load(f)
-        for task in data :
-            undone_tasks.append(task)
+    if os.path.exists(file_path_undone):
+        with open(file_path_undone,"r") as f:
+            data = json.load(f)
+            for task in data :
+                undone_tasks.append(task)
+    if os.path.exists(file_path_done):
+        with open(file_path_done,"r") as f:
+                data = json.load(f)
+                for task in data :
+                    done_tasks.append(task)
     
     def __init__(self,task,desc="",date="nodate"):
         self.uniq_code = str(uuid.uuid4())
@@ -46,7 +53,7 @@ class Task:
         print("***************")
     
     @classmethod
-    def done(cls):
+    def tick(cls):
         while True :
             try :
                 option = int(input("which task are u done with :")) -1
@@ -59,6 +66,7 @@ class Task:
             except ValueError :
                 print("Please insert a number")
                 continue
+            cls.write_to_file()
             print("The task has been ticked, good job")
             print(cls.done_tasks)
             break
@@ -83,18 +91,20 @@ class Task:
     
     @classmethod
     def write_to_file(cls):
-        with open(file=file_path,mode="w+" ) as file:
+        with open(file=file_path_undone,mode="w+" ) as file:
             json.dump(cls.undone_tasks,file,indent=4)
+        
+        with open(file=file_path_done,mode="w+") as f:
+            json.dump(cls.done_tasks,f,indent=4)
 
 def add_task():
     task_name=input("What do u wanna do champ ? 🎖️\n ")
     
     ### date should be formed correctly ### also the format and cooerct writing is really important
     date=input("when do u wanna do it (DD-MM-YYYY)? (leave blank for no date)\n")
-    if date :
-        date = datetime.datetime.strptime(date,"%d-%m-%Y").date()
-    else :
-        date = "no date"
+    if not date :
+        date = "no date"    
+    #     date = datetime.datetime.strptime(date,"%d-%m-%Y").date()
     desc=input("is there any decription ? (enter to leave it blank) \n")
     Task(task_name,desc,date)
     Task.write_to_file()
@@ -111,7 +121,7 @@ def main():
         
         match action:
             case "1" :
-                Task.done()
+                Task.tick()
             case "2":
                 ### make it a func and show the tasks more beutiful
                 add_task()
