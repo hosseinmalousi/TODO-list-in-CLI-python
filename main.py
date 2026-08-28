@@ -72,12 +72,33 @@ class Task:
             break
                 
     @classmethod
-    def edit(cls):
+    def edit_task(cls):
         while True:
-            option = int(input("which task do you want to edit (insert the index) : "))
-            prop = int(input("which property do u want to edit \n 1. Task name\n2. Date\n3. Description \n : "))
+            option = input("which task do you want to edit (insert the index) , (q for menu) : ")
+            if option.lower() == "q":
+                break
+            elif option.isdigit():
+                option = int(option)
+                if option not in range(len(cls.undone_tasks)+1):
+                    print("the index you have chosen,it does not exist ")
+                    continue
+            prop = int(input("which property do u want to edit\n 1. Task name\n2. Date\n3. Description \n : "))
             match prop:
-                case "1":
+                case 1:
+                    new_name = input("what's your new task name ? ")
+                    cls.undone_tasks[option -1]["task"] = new_name
+                    
+                case 2:
+                    new_date =input("what's the new date (DD-MM-YYYY) (leave blank for no date)? ")
+                    cls.undone_tasks[option - 1]["date"] = new_date
+                case 3:
+                    new_desc = input("what is the new decription ? ")
+                    cls.undone_tasks[option-1]["desc"] = new_desc
+            cls.write_to_file()
+            if input("more edit ?\n(Y/N) : ").lower() != "y" :
+                break
+                
+                    
                     
     
     @classmethod
