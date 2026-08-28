@@ -71,8 +71,14 @@ class Task:
             print(cls.done_tasks)
             break
                 
-            
-            
+    @classmethod
+    def edit(cls):
+        while True:
+            option = int(input("which task do you want to edit (insert the index) : "))
+            prop = int(input("which property do u want to edit \n 1. Task name\n2. Date\n3. Description \n : "))
+            match prop:
+                case "1":
+                    
     
     @classmethod
     def delete_task(cls):
@@ -128,7 +134,7 @@ def main():
             case "3":
                 Task.delete_task()
             case "4":
-                pass
+                Task.edit_task()
             case "5":
                 break
     print()          
