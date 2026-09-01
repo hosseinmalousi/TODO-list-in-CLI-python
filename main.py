@@ -4,17 +4,21 @@ import uuid
 import datetime
 import json
 
+# where the tasks are saved on disk
 file_path_undone = "undone_tasks.json"
 file_path_done = "done_tasks.json"
 
 def print_art():
+    # prints the banner at the start of the program
     print()
     print(Asccii_art.art + "\n")
 
 class Task:
-    
+    # one task = name + desc + date + done flag; the lists below are shared by ALL tasks (class level)
+
     undone_tasks=[]
     done_tasks = []
+    # runs once when the file is imported: loads the saved tasks from json into the lists
     if os.path.exists(file_path_undone):
         with open(file_path_undone,"r") as f:
             data = json.load(f)
@@ -27,7 +31,8 @@ class Task:
                     done_tasks.append(task)
     
     def __init__(self,task,desc="",date="nodate"):
-        self.uniq_code = str(uuid.uuid4())
+        # builds a new task and puts it straight into the undone list
+        self.uniq_code = str(uuid.uuid4())   # random id so every task is unique
         self.task = task
         self.date = date
         self.desc = desc
@@ -38,6 +43,7 @@ class Task:
         
     @classmethod
     def list_tasks(cls):
+        # prints every undone task with a number (1,2,3...) ; that number is what the user types later
         print("***************")
         print()
         ### show it as a string and sort them or with bullet points
@@ -54,9 +60,11 @@ class Task:
     
     @classmethod
     def tick(cls):
+        # marks a task as done : moves it from undone_tasks -> done_tasks
+        # the while/try keeps asking until the user gives a valid number
         while True :
             try :
-                option = int(input("which task are u done with :")) -1
+                option = int(input("which task are u done with :")) -1   # -1 because the list shows 1-based
                 cls.undone_tasks[option]["done"] = True
                 cls.done_tasks.append(cls.undone_tasks[option])
                 cls.undone_tasks.pop(option)
@@ -73,6 +81,8 @@ class Task:
                 
     @classmethod
     def edit_task(cls):
+        # lets the user change the name / date / description of an existing task
+        # loops so you can edit more than one thing before going back to the menu
         while True:
             option = input("which task do you want to edit (insert the index) , (q for menu) : ")
             if option.lower() == "q":
@@ -83,11 +93,10 @@ class Task:
                     print("the index you have chosen,it does not exist ")
                     continue
             prop = int(input("which property do u want to edit\n 1. Task name\n2. Date\n3. Description \n : "))
-            match prop:
+            match prop:   # 1 = name , 2 = date , 3 = description
                 case 1:
                     new_name = input("what's your new task name ? ")
                     cls.undone_tasks[option -1]["task"] = new_name
-                    
                 case 2:
                     new_date =input("what's the new date (DD-MM-YYYY) (leave blank for no date)? ")
                     cls.undone_tasks[option - 1]["date"] = new_date
@@ -103,6 +112,7 @@ class Task:
     
     @classmethod
     def delete_task(cls):
+        # removes one task by its index, or wipes the whole list if the user types A
         option = input("which task do you wanna delete (A for all) :")
         if option.isalpha() and option.upper() == "A" :
             cls.undone_tasks.clear()
@@ -118,6 +128,7 @@ class Task:
     
     @classmethod
     def write_to_file(cls):
+        # saves both lists back to the json files (call it after every change, else changes are lost)
         with open(file=file_path_undone,mode="w+" ) as file:
             json.dump(cls.undone_tasks,file,indent=4)
         
@@ -125,6 +136,7 @@ class Task:
             json.dump(cls.done_tasks,f,indent=4)
 
 def add_task():
+    # asks the user name/date/desc , creates the Task object and saves it
     task_name=input("What do u wanna do champ ? 🎖️\n ")
     
     ### date should be formed correctly ### also the format and cooerct writing is really important
@@ -137,6 +149,7 @@ def add_task():
     Task.write_to_file()
 
 def main():
+    # the main menu loop : show date + tasks , ask what to do , repeat until "5"
     print_art()
     is_running = True
     while is_running:
@@ -161,4 +174,5 @@ def main():
     print()          
 
 if __name__ == "__main__":
+    # only runs main() when this file is started directly (not when imported)
     main()

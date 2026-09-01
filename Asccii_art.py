@@ -1,3 +1,4 @@
+# just the "JUST do" ascii banner, imported and printed by main.py
 art ="""   $$$$$\ $$\   $$\  $$$$$$\ $$$$$$$$\             $$\           
    \__$$ |$$ |  $$ |$$  __$$\\__$$  __|            $$ |          
       $$ |$$ |  $$ |$$ /  \__|  $$ |          $$$$$$$ | $$$$$$\  
