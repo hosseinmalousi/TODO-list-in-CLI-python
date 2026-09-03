@@ -41,17 +41,32 @@ class Task:
         Task.undone_tasks.append({"uniq_code":self.uniq_code,"task":self.task,"desc":self.desc,"date":self.date , "done" : self.done})
 
         
+    @staticmethod
+    def showTime(date):
+        today = datetime.date.today() 
+        date = datetime.datetime.strptime(date,"%d/%m/%Y").date()
+        
+        if date == today:
+            return "Today"
+        elif (date - today) == datetime.timedelta(days=1):
+            return "Tomorrow"
+        elif (date - today) == datetime.timedelta(days=2):
+            return "'The day after tomorrow'"
+        else :
+            return date
+            
+    
     @classmethod
     def list_tasks(cls):
         # prints every undone task with a number (1,2,3...) ; that number is what the user types later
         print("***************")
         print()
         ### show it as a string and sort them or with bullet points
-        # it only effect on showing and the new ones also works 
+        # it only effect on showing and the new ones also works
         if cls.undone_tasks :
             for i,task in enumerate(cls.undone_tasks,1):
                 if task["done"] == False:
-                    print(f"{i}. the task : {task["task"]}, is due to {task["date"]}; descirption : '{task["desc"]}'")
+                    print(f"{i}. the task : {task["task"]}, is due to {cls.showTime(task["date"])}; descirption : '{task["desc"]}'")
             print()
         else :
             print("U have no task waiting for u ,go enjoy your day 🔥")
@@ -138,7 +153,8 @@ def add_task():
     task_name=input("What do u wanna do champ ? 🎖️\n ")
     
     ### date should be formed correctly ### also the format and cooerct writing is really important
-    date=input("when do u wanna do it (DD-MM-YYYY)? (leave blank for no date)\n")
+    date=input("when do u wanna do it (DD/MM/YYYY)? (leave blank for no date)\n")
+    Task.showTime(date)
     if not date :
         date = "no date"    
     #     date = datetime.datetime.strptime(date,"%d-%m-%Y").date()
@@ -171,12 +187,13 @@ def main():
                         Task.edit_task()
                     case "5":
                         break
-            elif not Task.undone_tasks and action != 2 :
+            elif not Task.undone_tasks and action != "2" :
                 print("the task list empty , please add a task first to continue")
                 continue
+            else :
+                add_task()
         else :
             print("please insert a number")
-        
     print()          
 
 if __name__ == "__main__":
