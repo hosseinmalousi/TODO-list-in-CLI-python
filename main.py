@@ -106,9 +106,7 @@ class Task:
             cls.write_to_file()
             if input("more edit ?\n(Y/N) : ").lower() != "y" :
                 break
-                
-                    
-                    
+                     
     
     @classmethod
     def delete_task(cls):
@@ -153,24 +151,32 @@ def main():
     print_art()
     is_running = True
     while is_running:
-        print(f"today is {datetime.date.today().strftime("%A")} {datetime.date.today().strftime("%d:%m:%Y")}")
+        print(f"today is {datetime.date.today().strftime("%A")} {datetime.datetime.today().strftime("%H:%M:%S , %d/%m/%Y")} \n")
         
         Task.list_tasks()
         
         action = input("""1.tick a task \n2.add a task  \n3.delete a task \n4.edit a task \n5.quit the program\n\nplease add the index: """)
         
-        match action:
-            case "1" :
-                Task.tick()
-            case "2":
-                ### make it a func and show the tasks more beutiful
-                add_task()
-            case "3":
-                Task.delete_task()
-            case "4":
-                Task.edit_task()
-            case "5":
-                break
+        if action.isdigit() :
+            if Task.undone_tasks :
+                match action:
+                    case "1" :
+                        Task.tick()
+                    case "2":
+                        ### make it a func and show the tasks more beutiful
+                        add_task()
+                    case "3":
+                        Task.delete_task()
+                    case "4":
+                        Task.edit_task()
+                    case "5":
+                        break
+            elif not Task.undone_tasks and action != 2 :
+                print("the task list empty , please add a task first to continue")
+                continue
+        else :
+            print("please insert a number")
+        
     print()          
 
 if __name__ == "__main__":
