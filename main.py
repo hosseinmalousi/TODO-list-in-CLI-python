@@ -79,7 +79,10 @@ class Task:
         # the while/try keeps asking until the user gives a valid number
         while True :
             try :
-                option = int(input("which task are u done with :")) -1   # -1 because the list shows 1-based
+                option = input("which task are u done with (q for main menu) :")   # -1 because the list shows 1-based
+                if option.lower() == "q" :
+                    break
+                option = int(option) - 1
                 cls.undone_tasks[option]["done"] = True
                 cls.done_tasks.append(cls.undone_tasks[option])
                 cls.undone_tasks.pop(option)
@@ -121,22 +124,34 @@ class Task:
             cls.write_to_file()
             if input("more edit ?\n(Y/N) : ").lower() != "y" :
                 break
-                     
+                    
+    @classmethod
+    def sort_list(cls):
+        pass
+        
     
     @classmethod
     def delete_task(cls):
         # removes one task by its index, or wipes the whole list if the user types A
-        option = input("which task do you wanna delete (A for all) :")
-        if option.isalpha() and option.upper() == "A" :
-            cls.undone_tasks.clear()
-        elif option.isnumeric() :
-            option = int(option)
-            try:
-                cls.undone_tasks.pop(option -1)
-            except IndexError :
-                print("The index you have chosen is not in the tasks")
-        else:
-            print("Please choose a the index of the task or 'A' for deleting all the list ")
+        while True :
+            if cls.undone_tasks :
+                option = input("which task do you wanna delete (A for all) (q for return) :")
+                if option.lower() == "q":
+                    break
+                if option.isalpha() and option.upper() == "A" :
+                    print("all tasks got deleted")
+                    cls.undone_tasks.clear()
+                elif option.isnumeric() :
+                    option = int(option)
+                    try:
+                        print(f"task : {cls.undone_tasks[option-1]["task"]} got deleted")
+                        cls.undone_tasks.pop(option -1)
+                    except IndexError :
+                        print("The index you have chosen is not in the tasks")
+                else:
+                    print("Please choose a the index of the task or 'A' for deleting all the list ")
+            else :
+                break
         cls.write_to_file()
     
     @classmethod
