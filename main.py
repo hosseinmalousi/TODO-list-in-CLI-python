@@ -57,15 +57,24 @@ class Task:
             
     
     @classmethod
-    def list_tasks(cls):
+    def list_tasks(cls ,option = ""):
         # prints every undone task with a number (1,2,3...) ; that number is what the user types later
         print("***************")
         print()
+        if option == "5" :
+            if cls.done_tasks :
+                for i,task in enumerate(cls.done_tasks,1):
+                    # if task["done"] == False:
+                        print(f"{i}. the task : {task["task"]}, is due to {cls.showTime(task["date"])}; descirption : '{task["desc"]}'")
+                print()
+            else :
+                print("U didnt do any of your tasks , get movin' ")
+        
         ### show it as a string and sort them or with bullet points
         # it only effect on showing and the new ones also works
-        if cls.undone_tasks :
+        elif cls.undone_tasks and option != "5":
             for i,task in enumerate(cls.undone_tasks,1):
-                if task["done"] == False:
+                # if task["done"] == False:
                     print(f"{i}. the task : {task["task"]}, is due to {cls.showTime(task["date"])}; descirption : '{task["desc"]}'")
             print()
         else :
@@ -77,54 +86,60 @@ class Task:
     def tick(cls):
         # marks a task as done : moves it from undone_tasks -> done_tasks
         # the while/try keeps asking until the user gives a valid number
-        while True :
-            try :
-                option = input("which task are u done with (q for main menu) :")   # -1 because the list shows 1-based
-                if option.lower() == "q" :
-                    break
-                option = int(option) - 1
-                cls.undone_tasks[option]["done"] = True
-                cls.done_tasks.append(cls.undone_tasks[option])
-                cls.undone_tasks.pop(option)
-            except IndexError :
-                print("the number you have enterd is not in the tasks")
-                continue
-            except ValueError :
-                print("Please insert a number")
-                continue
-            cls.write_to_file()
-            print("The task has been ticked, good job")
-            print(cls.done_tasks)
-            break
+        if cls.undone_tasks :
+            while True :
+                try :
+                    option = input("which task are u done with (q for main menu) :")   # -1 because the list shows 1-based
+                    if option.lower() == "q" :
+                        break
+                    option = int(option) - 1
+                    cls.undone_tasks[option]["done"] = True
+                    cls.done_tasks.append(cls.undone_tasks[option])
+                    cls.undone_tasks.pop(option)
+                except IndexError :
+                    print("the number you have enterd is not in the tasks")
+                    continue
+                except ValueError :
+                    print("Please insert a number")
+                    continue
+                cls.write_to_file()
+                print("The task has been ticked, good job")
+                print(cls.done_tasks)
+                break
+        else :
+            print("the task list empty , please add a task first to continue")
                 
     @classmethod
     def edit_task(cls):
         # lets the user change the name / date / description of an existing task
         # loops so you can edit more than one thing before going back to the menu
-        while True:
-            option = input("which task do you want to edit (insert the index) , (q for menu) : ")
-            if option.lower() == "q":
-                break
-            elif option.isdigit():
-                option = int(option)
-                if option not in range(len(cls.undone_tasks)+1):
-                    print("the index you have chosen,it does not exist ")
-                    continue
-            prop = int(input("which property do u want to edit\n 1. Task name\n2. Date\n3. Description \n : "))
-            match prop:   # 1 = name , 2 = date , 3 = description
-                case 1:
-                    new_name = input("what's your new task name ? ")
-                    cls.undone_tasks[option -1]["task"] = new_name
-                case 2:
-                    new_date =input("what's the new date (DD-MM-YYYY) (leave blank for no date)? ")
-                    cls.undone_tasks[option - 1]["date"] = new_date
-                case 3:
-                    new_desc = input("what is the new decription ? ")
-                    cls.undone_tasks[option-1]["desc"] = new_desc
-            cls.write_to_file()
-            if input("more edit ?\n(Y/N) : ").lower() != "y" :
-                break
-                    
+        if cls.undone_tasks :
+            while True:
+                option = input("which task do you want to edit (insert the index) , (q for menu) : ")
+                if option.lower() == "q":
+                    break
+                elif option.isdigit():
+                    option = int(option)
+                    if option not in range(len(cls.undone_tasks)+1):
+                        print("the index you have chosen,it does not exist ")
+                        continue
+                prop = int(input("which property do u want to edit\n 1. Task name\n2. Date\n3. Description \n : "))
+                match prop:   # 1 = name , 2 = date , 3 = description
+                    case 1:
+                        new_name = input("what's your new task name ? ")
+                        cls.undone_tasks[option -1]["task"] = new_name
+                    case 2:
+                        new_date =input("what's the new date (DD-MM-YYYY) (leave blank for no date)? ")
+                        cls.undone_tasks[option - 1]["date"] = new_date
+                    case 3:
+                        new_desc = input("what is the new decription ? ")
+                        cls.undone_tasks[option-1]["desc"] = new_desc
+                cls.write_to_file()
+                if input("more edit ?\n(Y/N) : ").lower() != "y" :
+                    break
+        else :
+            print("the task list empty , please add a task first to continue")
+                       
     @classmethod
     def sort_list(cls):
         pass
@@ -133,26 +148,29 @@ class Task:
     @classmethod
     def delete_task(cls):
         # removes one task by its index, or wipes the whole list if the user types A
-        while True :
-            if cls.undone_tasks :
-                option = input("which task do you wanna delete (A for all) (q for return) :")
-                if option.lower() == "q":
+        if cls.undone_tasks:
+            while True :
+                if cls.undone_tasks :
+                    option = input("which task do you wanna delete (A for all) (q for return) :")
+                    if option.lower() == "q":
+                        break
+                    if option.isalpha() and option.upper() == "A" :
+                        print("all tasks got deleted")
+                        cls.undone_tasks.clear()
+                    elif option.isnumeric() :
+                        option = int(option)
+                        try:
+                            print(f"task : {cls.undone_tasks[option-1]["task"]} got deleted")
+                            cls.undone_tasks.pop(option -1)
+                        except IndexError :
+                            print("The index you have chosen is not in the tasks")
+                    else:
+                        print("Please choose a the index of the task or 'A' for deleting all the list ")
+                else :
                     break
-                if option.isalpha() and option.upper() == "A" :
-                    print("all tasks got deleted")
-                    cls.undone_tasks.clear()
-                elif option.isnumeric() :
-                    option = int(option)
-                    try:
-                        print(f"task : {cls.undone_tasks[option-1]["task"]} got deleted")
-                        cls.undone_tasks.pop(option -1)
-                    except IndexError :
-                        print("The index you have chosen is not in the tasks")
-                else:
-                    print("Please choose a the index of the task or 'A' for deleting all the list ")
-            else :
-                break
-        cls.write_to_file()
+            cls.write_to_file()
+        else :
+            print("the task list empty , please add a task first to continue")
     
     @classmethod
     def write_to_file(cls):
@@ -186,10 +204,9 @@ def main():
         
         Task.list_tasks()
         
-        action = input("""1.tick a task \n2.add a task  \n3.delete a task \n4.edit a task \n5.quit the program\n\nplease add the index: """)
+        action = input("""1.tick a task \n2.add a task  \n3.delete a task \n4.edit a task \n5.show done tasks \n6.quit the program\n\nplease add the index: """)
         
         if action.isdigit() :
-            if Task.undone_tasks :
                 match action:
                     case "1" :
                         Task.tick()
@@ -201,12 +218,9 @@ def main():
                     case "4":
                         Task.edit_task()
                     case "5":
+                        Task.list_tasks(action)
+                    case "6":
                         break
-            elif not Task.undone_tasks and action != "2" :
-                print("the task list empty , please add a task first to continue")
-                continue
-            else :
-                add_task()
         else :
             print("please insert a number")
     print()          
