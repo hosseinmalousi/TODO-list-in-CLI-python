@@ -13,8 +13,13 @@ def sort_list(tasks, reverse=False):
     dates =[]
     sorted_list = []
     for task in tasks:
-        dates.append(task["date"])
-    dates.sort(key=lambda x: datetime.datetime.strptime(x, '%d/%m/%Y'))
+        if task["date"] != "no date":
+            dates.append(task["date"])
+        else : continue
+    try :
+        dates.sort(key=lambda x: datetime.datetime.strptime(x, '%d/%m/%Y'))
+    except :
+        print("the given format can't be handel\nplease add the date with given format")
     if reverse :
         dates.reverse()
     for date in dates :
@@ -26,14 +31,20 @@ def sort_list(tasks, reverse=False):
 
 def add_task():
     # asks the user name/date/desc , creates the Task object and saves it
-    task_name = input("What do u wanna do champ ? 🎖️\n ")
+    task_name = input("What do u wanna do champ ? 🎖️\n")
 
     ### date should be formed correctly ### also the format and cooerct writing is really important
-    date = input("when do u wanna do it (DD/MM/YYYY)? (leave blank for no date)\n")
-    Task.showTime(date)
-    if not date:
-        date = "no date"
-    #     date = datetime.datetime.strptime(date,"%d-%m-%Y").date()
+    while True:
+            date = input("when do u wanna do it (DD/MM/YYYY)? (leave blank for no date)\n")
+            print(date, datetime.datetime.strptime(date,"%d/%m/%Y").date().strftime("%d/%m/%Y"))
+            if not date:
+                date = "no date"
+                break
+            if date != datetime.datetime.strptime(date,"%d/%m/%Y").date().strftime("%d/%m/%Y"):
+                print("please add the date in the given format")
+                continue
+                #     date = datetime.datetime.strptime(date,"%d-%m-%Y").date()
+            break
     desc = input("is there any decription ? (enter to leave it blank) \n")
     Task(task_name, desc, date)
     Task.write_to_file()
@@ -54,8 +65,9 @@ class Task:
     if os.path.exists(file_path_undone):
         with open(file_path_undone, "r") as f:
             data = sort_list(json.load(f))
-            for task in data:
-                undone_tasks.append(task)
+            if data != "":
+                for task in data:
+                    undone_tasks.append(task)
     if os.path.exists(file_path_done):
         with open(file_path_done, "r") as f:
             data = json.load(f)
@@ -82,17 +94,20 @@ class Task:
 
     @staticmethod
     def showTime(date):
-        today = datetime.date.today()
-        date = datetime.datetime.strptime(date, "%d/%m/%Y").date()
+        try :
+            today = datetime.date.today()
+            date = datetime.datetime.strptime(date, "%d/%m/%Y").date()
 
-        if date == today:
-            return "Today"
-        elif (date - today) == datetime.timedelta(days=1):
-            return "Tomorrow"
-        elif (date - today) == datetime.timedelta(days=2):
-            return "'The day after tomorrow'"
-        else:
-            return date
+            if date == today:
+                return "Today"
+            elif (date - today) == datetime.timedelta(days=1):
+                return "Tomorrow"
+            elif (date - today) == datetime.timedelta(days=2):
+                return "'The day after tomorrow'"
+            else:
+                return date
+        except ValueError:
+            return "No Given Date"
 
     @classmethod
     def list_tasks(cls, option=""):
@@ -192,7 +207,7 @@ class Task:
         else:
             print("the task list empty , please add a task first to continue")
 
-    @staticmethod
+    
     @classmethod
     def delete_task(cls):
         # removes one task by its index, or wipes the whole list if the user types A
