@@ -21,7 +21,7 @@ class Task:
     # runs once when the file is imported: loads the saved tasks from json into the lists
     if os.path.exists(file_path_undone):
         with open(file_path_undone,"r") as f:
-            data = json.load(f)
+            data = sort_list(json.load(f))
             for task in data :
                 undone_tasks.append(task)
     if os.path.exists(file_path_done):
@@ -139,12 +139,18 @@ class Task:
                     break
         else :
             print("the task list empty , please add a task first to continue")
-                       
-    @classmethod
-    def sort_list(cls):
-        pass
-        
     
+    @staticmethod                   
+    def sort_list(tasks,reverse = False):
+        sorted_list = []
+        for task in tasks :
+            for i in tasks :
+                if datetime.datetime.strptime(task["date"],"%d/%m/%Y") > datetime.datetime.strptime(i["date"],"%d/%m/%Y") :
+                    sorted_list.append(i)
+        return sorted_list
+                    
+                
+        
     @classmethod
     def delete_task(cls):
         # removes one task by its index, or wipes the whole list if the user types A
