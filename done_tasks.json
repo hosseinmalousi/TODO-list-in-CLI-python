@@ -1,5 +1,19 @@
 [
     {
+        "uniq_code": "0793b21e-9f55-453a-8da9-78317952f481",
+        "task": "add error handler ",
+        "desc": "",
+        "date": "16/09/2026",
+        "done": true
+    },
+    {
+        "uniq_code": "d3341815-dba9-4a8a-82f2-027f00f6d381",
+        "task": "go to doctor",
+        "desc": "",
+        "date": "15/09/2026",
+        "done": true
+    },
+    {
         "uniq_code": "bdb8ac0a-1a33-4cce-b05c-61096dac6d5a",
         "task": "play control",
         "desc": "it is in my windows ",
