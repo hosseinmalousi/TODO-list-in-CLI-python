@@ -5,8 +5,8 @@ import datetime
 import json
 
 # where the tasks are saved on disk
-file_path_undone = "undone_tasks.json"
-file_path_done = "done_tasks.json"
+file_path_undone = "./TASKS/undone_tasks.json"
+file_path_done = "./TASKS/done_tasks.json"
 
 
 def sort_list(tasks, ):
