@@ -45,14 +45,16 @@ def add_task():
     ### date should be formed correctly ### also the format and cooerct writing is really important
     while True:
             date = input("when do u wanna do it (DD/MM/YYYY)? (leave blank for no date)\n")
-            
             if not date:
                 date = "no date"
                 break
-            if date != datetime.datetime.strptime(date,"%d/%m/%Y").date().strftime("%d/%m/%Y"):
+            try :
+                if date != datetime.datetime.strptime(date,"%d/%m/%Y").date().strftime("%d/%m/%Y"):
+                    print("please add the date in the given format")
+                    continue
+            except ValueError:
                 print("please add the date in the given format")
                 continue
-                #     date = datetime.datetime.strptime(date,"%d-%m-%Y").date()
             break
     desc = input("is there any decription ? (enter to leave it blank) \n")
     Task(task_name, desc, date)
@@ -197,26 +199,34 @@ class Task:
                     if option not in range(len(cls.undone_tasks) or option < 0):
                         print("the index you have chosen,it does not exist ")
                         continue
-                    
-                prop = input(
-                        "which property do u want to edit\n 1. Task name\n2. Date\n3. Description \n (q for menu) : ")
-                if prop.lower() == "q":
-                    break
-                match int(prop):  # 1 = name , 2 = date , 3 = description
-                    case 1:
-                        new_name = input("what's your new task name ? ")
-                        cls.undone_tasks[option]["task"] = new_name
-                    case 2:
-                        new_date = input(
-                            "what's the new date (DD/MM/YYYY) (leave blank for no date)? "
-                        )
-                        cls.undone_tasks[option]["date"] = new_date
-                    case 3:
-                        new_desc = input("what is the new decription ? ")
-                        cls.undone_tasks[option]["desc"] = new_desc
-                cls.write_to_file()
-                if input("more edit ?\n(Y/N) : ").lower() != "y":
-                    break
+                else : print("please add a correct input")
+                while True:    
+                    prop = input(
+                            "which property do u want to edit\n 1. Task name\n2. Date\n3. Description \n (q for menu) : ")
+                    if prop.lower() == "q":
+                        break
+                    elif prop.isdigit():
+                        prop = int(prop)
+                        if prop < 4 and prop > 0:
+                            match prop:  # 1 = name , 2 = date , 3 = description
+                                case 1:
+                                    new_name = input("what's your new task name ? ")
+                                    cls.undone_tasks[option]["task"] = new_name
+                                case 2:
+                                    new_date = input(
+                                        "what's the new date (DD/MM/YYYY) (leave blank for no date)? "
+                                    )
+                                    cls.undone_tasks[option]["date"] = new_date
+                                case 3:
+                                    new_desc = input("what is the new decription ? ")
+                                    cls.undone_tasks[option]["desc"] = new_desc
+                                
+                            cls.write_to_file()
+                            if input("more edit ?\n(Y/N) : ").lower() != "y":
+                                break
+                        else : print("the given index is not in range")
+                    else :
+                        print("please add a correct input")
         else:
             print("the task list empty , please add a task first to continue")
 
@@ -240,7 +250,7 @@ class Task:
                         if option >= 0:
                             try:
                                 print(
-                                    f"task : {cls.undone_tasks[option-1]["task"]} got deleted"
+                                    f"task : {cls.undone_tasks[option]["task"]} got deleted"
                                 )
                                 cls.undone_tasks.pop(option)
                             except IndexError:
