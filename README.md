@@ -54,10 +54,17 @@ When adding a task, enter a date in `DD/MM/YYYY` format, for example `24/12/2026
 └── done_tasks.json      # Completed task storage
 ```
 
-## Ideas for the next version
+## Roadmap — next version
 
-See the project review for recommended bug fixes and feature ideas before treating the stored JSON files as long-term data.
+Plans for the next version will be added here as the project evolves.
+
+- [ ] Add the first goal for the next version
+- [ ] Add planned improvements or changes
 
 ## License
 
 No license has been specified yet. Add one (for example, MIT) if you plan to share or publish the project.
+
+## Acknowledgments
+
+AI was used only at the end of V1 to help identify bugs and to write this README. The application itself was built independently.
