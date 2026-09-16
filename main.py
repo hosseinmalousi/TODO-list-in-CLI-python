@@ -9,34 +9,43 @@ file_path_undone = "undone_tasks.json"
 file_path_done = "done_tasks.json"
 
 
-def sort_list(tasks, reverse=False):
+def sort_list(tasks, ):
     dates =[]
+    no_date_list=[]
     sorted_list = []
     for task in tasks:
         if task["date"] != "no date":
             dates.append(task["date"])
-        else : continue
+        else : no_date_list.append(task)
     try :
         dates.sort(key=lambda x: datetime.datetime.strptime(x, '%d/%m/%Y'))
     except :
         print("the given format can't be handel\nplease add the date with given format")
-    if reverse :
-        dates.reverse()
+    # if reverse :
+    #     dates.reverse()
     for date in dates :
         for task in tasks :
-            if date == task["date"]:
+            if date == task["date"] and task not in sorted_list:
                 sorted_list.append(task)
+    sorted_list += no_date_list        
+    
     return sorted_list
 
 
 def add_task():
     # asks the user name/date/desc , creates the Task object and saves it
-    task_name = input("What do u wanna do champ ? 🎖️\n")
+    while True:
+        task_name = input("What do u wanna do champ ? 🎖️\n")
+        if task_name :
+            break
+        else :
+            print("Task can't be nameless")
+            continue
 
     ### date should be formed correctly ### also the format and cooerct writing is really important
     while True:
             date = input("when do u wanna do it (DD/MM/YYYY)? (leave blank for no date)\n")
-            print(date, datetime.datetime.strptime(date,"%d/%m/%Y").date().strftime("%d/%m/%Y"))
+            
             if not date:
                 date = "no date"
                 break
@@ -105,7 +114,7 @@ class Task:
             elif (date - today) == datetime.timedelta(days=2):
                 return "'The day after tomorrow'"
             else:
-                return date
+                return date.strftime("%d/%m/%Y")
         except ValueError:
             return "No Given Date"
 
@@ -128,7 +137,7 @@ class Task:
         ### show it as a string and sort them or with bullet points
         # it only effect on showing and the new ones also works
         elif cls.undone_tasks and option != "5":
-            for i, task in enumerate(cls.undone_tasks, 1):
+            for i, task in enumerate(sort_list(cls.undone_tasks), 1):
                 # if task["done"] == False:
                 print(
                     f"{i}. the task : {task["task"]}, is due to {cls.showTime(task["date"])}; descirption : '{task["desc"]}'"
@@ -152,19 +161,23 @@ class Task:
                     if option.lower() == "q":
                         break
                     option = int(option) - 1
-                    cls.undone_tasks[option]["done"] = True
-                    cls.done_tasks.append(cls.undone_tasks[option])
-                    cls.undone_tasks.pop(option)
+                    if option >= 0:
+                        cls.undone_tasks[option]["done"] = True
+                        cls.done_tasks.append(cls.undone_tasks[option])
+                        cls.undone_tasks.pop(option)
+                        cls.write_to_file()
+                        print("The task has been ticked, good job")
+                        print(cls.done_tasks)
+                        break
+                    else :
+                        print("please choose an right index")
                 except IndexError:
                     print("the number you have enterd is not in the tasks")
                     continue
                 except ValueError:
                     print("Please insert a number")
                     continue
-                cls.write_to_file()
-                print("The task has been ticked, good job")
-                print(cls.done_tasks)
-                break
+                
         else:
             print("the task list empty , please add a task first to continue")
 
@@ -180,27 +193,27 @@ class Task:
                 if option.lower() == "q":
                     break
                 elif option.isdigit():
-                    option = int(option)
-                    if option not in range(len(cls.undone_tasks) + 1):
+                    option = int(option) - 1
+                    if option not in range(len(cls.undone_tasks) or option < 0):
                         print("the index you have chosen,it does not exist ")
                         continue
-                prop = int(
-                    input(
-                        "which property do u want to edit\n 1. Task name\n2. Date\n3. Description \n : "
-                    )
-                )
-                match prop:  # 1 = name , 2 = date , 3 = description
+                    
+                prop = input(
+                        "which property do u want to edit\n 1. Task name\n2. Date\n3. Description \n (q for menu) : ")
+                if prop.lower() == "q":
+                    break
+                match int(prop):  # 1 = name , 2 = date , 3 = description
                     case 1:
                         new_name = input("what's your new task name ? ")
-                        cls.undone_tasks[option - 1]["task"] = new_name
+                        cls.undone_tasks[option]["task"] = new_name
                     case 2:
                         new_date = input(
-                            "what's the new date (DD-MM-YYYY) (leave blank for no date)? "
+                            "what's the new date (DD/MM/YYYY) (leave blank for no date)? "
                         )
-                        cls.undone_tasks[option - 1]["date"] = new_date
+                        cls.undone_tasks[option]["date"] = new_date
                     case 3:
                         new_desc = input("what is the new decription ? ")
-                        cls.undone_tasks[option - 1]["desc"] = new_desc
+                        cls.undone_tasks[option]["desc"] = new_desc
                 cls.write_to_file()
                 if input("more edit ?\n(Y/N) : ").lower() != "y":
                     break
@@ -223,14 +236,16 @@ class Task:
                         print("all tasks got deleted")
                         cls.undone_tasks.clear()
                     elif option.isnumeric():
-                        option = int(option)
-                        try:
-                            print(
-                                f"task : {cls.undone_tasks[option-1]["task"]} got deleted"
-                            )
-                            cls.undone_tasks.pop(option - 1)
-                        except IndexError:
-                            print("The index you have chosen is not in the tasks")
+                        option = int(option) - 1
+                        if option >= 0:
+                            try:
+                                print(
+                                    f"task : {cls.undone_tasks[option-1]["task"]} got deleted"
+                                )
+                                cls.undone_tasks.pop(option)
+                            except IndexError:
+                                print("The index you have chosen is not in the tasks")
+                        else : print("the choosen inex is not correct")
                     else:
                         print(
                             "Please choose a the index of the task or 'A' for deleting all the list "
